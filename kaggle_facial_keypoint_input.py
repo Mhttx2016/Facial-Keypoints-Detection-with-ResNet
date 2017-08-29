@@ -24,6 +24,7 @@ from sklearn.externals import joblib
 
 def build_input(data_path, batch_size=128, mode='train'):
     """kaggle facial keypoint dataset image and labels.
+    NOTE: the dataset annotations are inconsistent(https://www.reddit.com/r/MachineLearning/comments/2pknvo/tutorial_using_convolutional_neural_nets_to/)
 
     Args:
         dataset: Either 'train' or 'eval'.
@@ -48,7 +49,8 @@ def build_input(data_path, batch_size=128, mode='train'):
     reader = tf.TextLineReader(skip_header_lines=1)
     key, value = reader.read(filename_queue)
 
-    record_defaults = [[0.0] for _ in range(num_keypoint*2)] + [[""]] # read label as float32 and image data in as a string
+    # read label as float32 and image data as a string, NaN labels are set to -96.0, normalized to -1.0
+    record_defaults = [[float(-image_size)] for _ in range(num_keypoint*2)] + [[""]] 
     # print('record_defaults:', record_defaults)
     cols = tf.decode_csv(value, record_defaults=record_defaults)
     label = tf.stack(cols[:-1])
@@ -74,7 +76,6 @@ def build_input(data_path, batch_size=128, mode='train'):
         # image = tf.image.per_image_standardization(image)
 
     image = tf.image.per_image_standardization(image)
-
 
     # preprocess label
     # label = (label - (image_size // 2)) / (image_size / 2)
@@ -104,12 +105,12 @@ def build_input(data_path, batch_size=128, mode='train'):
     #     coord = tf.train.Coordinator()
     #     threads = tf.train.start_queue_runners(coord = coord)
 
-    #     for _ in range(3):
+    #     for _ in range(1000):
     #         examples, labels = sess.run([image_batch, label_batch])
     #         print('####'*20)
     #         print(labels)
-    #         print('****'*20)
-    #         print(examples)
+    #         # print('****'*20)
+    #         # print(examples)
 
     # coord.request_stop()
     # coord.join(threads)
@@ -154,5 +155,5 @@ if __name__ == '__main__':
     # ***********Debug Start************
     build_input(
         batch_size=4,
-        data_path='/media/mhttx/F/project_developing/kaggle_facial_keypoint_dataset/training_set.csv')
+        data_path='/media/mhttx/F/project_developing/kaggle_facial_keypoint_dataset/training.csv')
     # ***********Debug End************

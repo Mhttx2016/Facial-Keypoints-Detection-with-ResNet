@@ -128,7 +128,8 @@ class ResNet(object):
 
         if self.mode != 'test':
             with tf.variable_scope('costs'):
-                xent = tf.reduce_mean(tf.reduce_sum(tf.square(self.predictions - self.labels), 1))
+                labels_mask = tf.cast(tf.not_equal(self.labels, -1.0), tf.float32)
+                xent = tf.reduce_mean(tf.reduce_sum(tf.square(labels_mask*(self.predictions - self.labels)), 1))
                 self.cost = xent + self._decay()
                 tf.summary.scalar('cost', self.cost)
 
@@ -148,7 +149,7 @@ class ResNet(object):
             optimizer = tf.train.MomentumOptimizer(self.lrn_rate, 0.9)
         elif sel.hps.optimizer == 'adam':
             optimizer = tf.train.AdamOptimizer(self.lrn_rate)
-        elif self.hps.optimizer = 'rspm':
+        elif self.hps.optimizer == 'rspm':
             optimizer = tf.train.RMSPropOptimizer(self.lrn_rate)
 
         apply_op = optimizer.apply_gradients(

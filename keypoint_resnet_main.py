@@ -31,24 +31,24 @@ from kaggle_facial_keypoint_input import *
 counter = 1
 FLAGS = tf.app.flags.FLAGS
 # tf.app.flags.DEFINE_string('dataset', 'cifar10', 'cifar10 or cifar100.')
-tf.app.flags.DEFINE_string('mode', 'demo', 'train or eval or test or demo.')
+tf.app.flags.DEFINE_string('mode', 'test', 'train or eval or test or demo.')
 
-tf.app.flags.DEFINE_string('train_data_path', '/media/mhttx/F/project_developing/kaggle_facial_keypoint_dataset/training_set*',
+tf.app.flags.DEFINE_string('train_data_path', '/media/mhttx/F/project_developing/kaggle_facial_keypoint_dataset/training.csv',
                            'Filepattern for training data.')
 tf.app.flags.DEFINE_string('eval_data_path', '/media/mhttx/F/project_developing/kaggle_facial_keypoint_dataset/validation_set.csv',
                            'Filepattern for eval data')
 tf.app.flags.DEFINE_string('test_data_path', '/media/mhttx/F/project_developing/kaggle_facial_keypoint_dataset/test.csv',
                            'Filepattern for eval data')
 tf.app.flags.DEFINE_integer('image_size', 96, 'Image side length.')
-tf.app.flags.DEFINE_string('train_dir', '/media/mhttx/F/project_developing/models-master/resnet/keypoint_resnet_model/train',
+tf.app.flags.DEFINE_string('train_dir', '/media/mhttx/F/project_developing/models-master/resnet/resnet/resnet32_all_kaggle_model/train',
                            'Directory to keep training outputs.')
-tf.app.flags.DEFINE_string('eval_dir', '/media/mhttx/F/project_developing/models-master/resnet/keypoint_resnet_model_80000/eval',
+tf.app.flags.DEFINE_string('eval_dir', '/media/mhttx/F/project_developing/models-master/resnet/resnet/resnet32_all_kaggle_model/eval',
                            'Directory to keep eval outputs.')
 tf.app.flags.DEFINE_integer('eval_batch_count', 80,
                             'Number of batches to eval.')
 tf.app.flags.DEFINE_bool('eval_once', True,
                          'Whether evaluate the model only once.')
-tf.app.flags.DEFINE_string('log_root', '/media/mhttx/F/project_developing/models-master/resnet/keypoint_resnet_model_80000',
+tf.app.flags.DEFINE_string('log_root', '/media/mhttx/F/project_developing/models-master/resnet/resnet/resnet32_all_kaggle_model',
                            'Directory to keep the checkpoints. Should be a '
                            'parent directory of FLAGS.train_dir/eval_dir.')
 tf.app.flags.DEFINE_integer('num_gpus', 1,
@@ -255,25 +255,28 @@ def test(hps, filename, labels_exist=True):
         print('batch_conut:', batch_count)
 
 
-    assert normalized_images.shape[0] == all_pred_coords.shape[0]
+    # assert normalized_images.shape[0] == all_pred_coords.shape[0]
+
+    # for coord in all_pred_coords:
+    #     print(coord)
 
     # np.save('test_predict.npy', all_pred_coords)
 
 
-        # for i in range(test_batch_size):
-        #     global_num = batch_count*test_batch_size + i
-        #     image = images[global_num]
-        #     pred_coord = pred_coords[i]
-        #     if labels is not None:
-        #         true_label = labels[global_num]
-        #     else:
-        #         true_label = None
+        for i in range(test_batch_size):
+            global_num = batch_count*test_batch_size + i
+            image = images[global_num]
+            pred_coord = pred_coords[i].reshape((1,-1,2))
+            if labels is not None:
+                true_label = labels[global_num].reshape((1,-1,2))
+            else:
+                true_label = None
 
-        #     image = image.reshape((image.shape[0],image.shape[1]))
-        #     pil_img = Image.fromarray(np.uint8(image),'L')
-        #     visualize_keypoints(pil_img, pred_coord, true_keypoints=true_label)
-        #     plt.savefig('model_80000_result/' + 'model_80000_detected_test_set_' + str(global_num) + '.jpg')
-        #     plt.show()
+            image = image.reshape((image.shape[0],image.shape[1]))
+            pil_img = Image.fromarray(np.uint8(image),'L')
+            visualize_keypoints(pil_img, pred_coord, true_keypoints=true_label)
+            plt.savefig('resnet_model_kaggle_all_result/' + 'eval_set' + str(global_num) + '.jpg')
+            plt.show()
             
 
 
@@ -417,7 +420,7 @@ def main(_):
                                 use_bottleneck=False,
                                 weight_decay_rate=0.0002,
                                 relu_leakiness=0.1,
-                                optimizer='mom')
+                                optimizer='adam')
 
 
     with tf.device(dev):
