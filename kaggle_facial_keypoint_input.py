@@ -58,20 +58,23 @@ def build_input(data_path, batch_size=128, mode='train'):
     image = tf.reshape(image, [image_size, image_size,depth])
 
     # preprocess image
-    if mode == 'train':
-        image = tf.image.resize_image_with_crop_or_pad(
-        image, image_size+4, image_size+4)
-        image = tf.random_crop(image, [image_size, image_size, depth])
-        image = tf.image.random_flip_left_right(image)
+    # if mode == 'train':
+        # image = tf.image.resize_image_with_crop_or_pad( # # the coordinates should also be adjusted
+        # image, image_size+4, image_size+4)
+        # image = tf.random_crop(image, [image_size, image_size, depth])
+        # image = tf.image.random_flip_left_right(image) # the coordinates should also be flipped
         # Brightness/saturation/constrast provides small gains .2%~.5% on cifar.
         # image = tf.image.random_brightness(image, max_delta=63. / 255.)
         # image = tf.image.random_saturation(image, lower=0.5, upper=1.5)
         # image = tf.image.random_contrast(image, lower=0.2, upper=1.8)
-        image = tf.image.per_image_standardization(image) #(x - mean) / adjusted_stddev
-    else:
-        image = tf.image.resize_image_with_crop_or_pad(
-            image, image_size, image_size)
-        image = tf.image.per_image_standardization(image)
+        # image = tf.image.per_image_standardization(image) #(x - mean) / adjusted_stddev
+    # else:
+        # image = tf.image.resize_image_with_crop_or_pad(
+        #     image, image_size, image_size)
+        # image = tf.image.per_image_standardization(image)
+
+    image = tf.image.per_image_standardization(image)
+
 
     # preprocess label
     # label = (label - (image_size // 2)) / (image_size / 2)
