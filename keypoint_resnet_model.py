@@ -146,6 +146,10 @@ class ResNet(object):
             optimizer = tf.train.GradientDescentOptimizer(self.lrn_rate)
         elif self.hps.optimizer == 'mom':
             optimizer = tf.train.MomentumOptimizer(self.lrn_rate, 0.9)
+        elif sel.hps.optimizer == 'adam':
+            optimizer = tf.train.AdamOptimizer(self.lrn_rate)
+        elif self.hps.optimizer = 'rspm':
+            optimizer = tf.train.RMSPropOptimizer(self.lrn_rate)
 
         apply_op = optimizer.apply_gradients(
             zip(grads, trainable_variables),
