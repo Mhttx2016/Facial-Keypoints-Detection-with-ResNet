@@ -1,4 +1,4 @@
-# Copyright 2017 Mhttx. All Rights Reserved.
+# __author__ Mhttx.
 #
 
 """split the train dataset training.csv into training set and validation set
